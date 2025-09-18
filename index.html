@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的日曆</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f4f4f9;
+            margin: 0;
+        }
+
+        .calendar-container {
+            width: 80%;
+            max-width: 600px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .calendar-header h2 {
+            margin: 0;
+            font-size: 1.8em;
+            color: #333;
+        }
+
+        .calendar-header button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        .calendar-header button:hover {
+            background-color: #0056b3;
+        }
+
+        .calendar-grid {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+        }
+
+        .calendar-grid th, .calendar-grid td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            font-size: 1em;
+        }
+
+        .calendar-grid th {
+            background-color: #f0f0f0;
+            color: #555;
+            font-weight: bold;
+        }
+
+        .calendar-grid td {
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .calendar-grid td:hover:not(.current-day) {
+            background-color: #e9e9e9;
+        }
+
+        .calendar-grid .current-day {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="calendar-container">
+    <div class="calendar-header">
+        <button id="prevBtn">&lt;</button>
+        <h2 id="currentMonthYear"></h2>
+        <button id="nextBtn">&gt;</button>
+    </div>
+    <table class="calendar-grid">
+        <thead>
+            <tr>
+                <th>日</th>
+                <th>一</th>
+                <th>二</th>
+                <th>三</th>
+                <th>四</th>
+                <th>五</th>
+                <th>六</th>
+            </tr>
+        </thead>
+        <tbody id="calendar-body">
+            </tbody>
+    </table>
+</div>
+
+<script>
+    const calendarBody = document.getElementById('calendar-body');
+    const currentMonthYear = document.getElementById('currentMonthYear');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+
+    let date = new Date();
+    let currentYear = date.getFullYear();
+    let currentMonth = date.getMonth();
+
+    const monthNames = ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"];
+    
+    function renderCalendar() {
+        const firstDay = new Date(currentYear, currentMonth, 1);
+        const lastDay = new Date(currentYear, currentMonth + 1, 0);
+        const daysInMonth = lastDay.getDate();
+        const startDayOfWeek = firstDay.getDay();
+
+        currentMonthYear.textContent = `${currentYear}年 ${monthNames[currentMonth]}`;
+        
+        calendarBody.innerHTML = '';
+        let row = document.createElement('tr');
+        
+        // 填充空白日
+        for (let i = 0; i < startDayOfWeek; i++) {
+            const cell = document.createElement('td');
+            cell.textContent = '';
+            row.appendChild(cell);
+        }
+
+        // 填充當月日
+        for (let day = 1; day <= daysInMonth; day++) {
+            if (row.children.length === 7) {
+                calendarBody.appendChild(row);
+                row = document.createElement('tr');
+            }
+            const cell = document.createElement('td');
+            cell.textContent = day;
+            
+            // 標示今天的日期
+            if (day === date.getDate() && currentMonth === date.getMonth() && currentYear === date.getFullYear()) {
+                cell.classList.add('current-day');
+            }
+            
+            row.appendChild(cell);
+        }
+
+        // 填充剩餘的空白日
+        while (row.children.length < 7) {
+            const cell = document.createElement('td');
+            cell.textContent = '';
+            row.appendChild(cell);
+        }
+        calendarBody.appendChild(row);
+    }
+    
+    prevBtn.addEventListener('click', () => {
+        currentMonth--;
+        if (currentMonth < 0) {
+            currentMonth = 11;
+            currentYear--;
+        }
+        renderCalendar();
+    });
+
+    nextBtn.addEventListener('click', () => {
+        currentMonth++;
+        if (currentMonth > 11) {
+            currentMonth = 0;
+            currentYear++;
+        }
+        renderCalendar();
+    });
+
+    renderCalendar();
+</script>
+
+</body>
+</html>
